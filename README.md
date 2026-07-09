@@ -545,3 +545,64 @@ MIT License
 ---
 
 ⭐ **Star the repo if you found it useful!**
+
+---
+
+# Deployment Guide
+
+## Infrastructure
+
+- Cloud Provider: AWS
+- Compute: EC2 Ubuntu 24.04 LTS
+- Database: Amazon RDS PostgreSQL
+- Reverse Proxy: Nginx
+- CI/CD: Jenkins
+- Container Runtime: Docker
+
+## Architecture
+
+Client
+      │
+      ▼
+Nginx Reverse Proxy
+      │
+ ┌────┴─────┐
+ │          │
+ ▼          ▼
+CRUD API   Multi-Auth
+ │          │
+ └────┬─────┘
+      ▼
+Amazon RDS PostgreSQL
+
+## Database Strategy
+
+Both applications use a single Amazon RDS PostgreSQL instance with two separate databases:
+
+- crud_db
+- multi_auth_db
+
+This approach reduces infrastructure cost while maintaining logical isolation between applications.
+
+## Open Ports
+
+| Port | Purpose |
+|------|---------|
+|22|SSH (restricted to administrator IP)|
+|80|HTTP|
+|443|HTTPS|
+|9090|Jenkins|
+|5000|Multi-Auth (internal, proxied through Nginx)|
+
+## CI/CD
+
+Deployment is automated using Jenkins pipelines.
+
+Pipeline stages:
+
+- Checkout
+- Install Dependencies
+- Generate Prisma Client
+- Run Prisma Migrations
+- Restart Application
+- Health Check
